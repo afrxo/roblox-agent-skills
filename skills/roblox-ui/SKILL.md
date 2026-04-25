@@ -678,6 +678,74 @@ local ui = scope:Card { [Children] = scope:Button { Text = "OK" } }
 
 ---
 
+## Stories — UI Labs
+
+[UI Labs](https://ui-labs.luau.page) is a Storybook-style Studio plugin for Roblox. Preview components without running the game; hot-reloads on file change; sandboxed environment so test mounts don't pollute project state.
+
+Use stories when iterating on a single component visually, exposing controls (text, color, boolean) for design review, or covering states (default / hover / disabled / loading) without wiring a full game scene.
+
+### Install
+
+- **Plugin** — Roblox Marketplace asset `14293316215` (or build from GitHub source).
+- **Utility package** (optional, recommended for typed helpers):
+  - Wally: `pepeeltoro41/ui-labs`
+  - npm (roblox-ts): `@rbxts/ui-labs`
+
+UI Labs runs without the package — the package adds typed helpers like `CreateFusionStory`.
+
+### File conventions
+
+- **Stories** — `ModuleScript` whose name ends in `.story` (e.g. `Button.story.luau`). UI Labs auto-discovers them.
+- **Storybooks** — `ModuleScript` whose name ends in `.storybook`. Returns a table with:
+  - `storyRoots` (required) — array of `Instance`s to scan for stories.
+  - `name` (optional) — display name; defaults to the module name.
+  - `groupRoots` (optional, boolean) — separate folder per `storyRoots` entry.
+- Stories without a storybook land in **"Unknown Stories"**. Group them as the project grows.
+
+### Fusion 0.3 story shape
+
+```luau
+return {
+    fusion = Fusion,
+    controls = { Visible = true, Label = "Click me" },
+    story = function(props)
+        -- props.target   : Frame to mount into
+        -- props.controls : Fusion.Value for each control, reactive
+        -- props.scope    : Fusion 0.3 scope, auto-cleanup on unmount
+
+        return props.scope:New "TextButton" {
+            Parent = props.target,
+            Size = UDim2.fromScale(1, 1),
+            Visible = props.controls.Visible,
+            Text = props.controls.Label,
+        }
+        -- No cleanup return needed — props.scope is doCleanup'd on unmount.
+    end,
+}
+```
+
+Without `props.scope` (older Fusion or manual cleanup) the `story` function must return one of:
+
+- a Roblox `Instance` — destroyed on unmount, OR
+- a `() -> ()` cleanup function — invoked on unmount.
+
+### Controls
+
+Every key in the `controls` table becomes a `Fusion.Value` exposed at `props.controls.<name>`. Bind directly to instance props for live updates as the designer scrubs the control panel — no manual `Observer` needed.
+
+Primitive controls (string, number, boolean, Color3, EnumItem, etc.) infer from the default value. Advanced controls (slider ranges, choice dropdowns) ship via the utility package — see [`/docs/controls`](https://ui-labs.luau.page/docs/controls/adding).
+
+### Anti-patterns
+
+- Mounting outside `props.target` — UI Labs can't sandbox or unmount it; persists across reloads.
+- Building a fresh `scoped(Fusion)` inside the story — use `props.scope` so unmount tears down cleanly.
+- Story files importing real game state (`Players.LocalPlayer`, RemoteEvents) — stories should run with mocked inputs; pass values via `controls`.
+- Returning `nil` without using `props.scope` — instance leaks on unmount.
+
+See [`examples/fusion-story.luau`](examples/fusion-story.luau).
+
+---
+
 ## Common Mistakes
 
 | ❌ | ✅ |
@@ -715,4 +783,5 @@ local ui = scope:Card { [Children] = scope:Button { Text = "OK" } }
 - [`examples/fusion-list.luau`](examples/fusion-list.luau) — dynamic children driven by a state object.
 - [`examples/fusion-form.luau`](examples/fusion-form.luau) — `[Out "Text"]` capture + Instance-by-assignment for programmatic focus; submit handler.
 - [`examples/fusion-animation.luau`](examples/fusion-animation.luau) — `Tween` + `Spring`: hover scale (Spring), color/transparency transitions (Tween), drop-shadow fade.
+- [`examples/fusion-story.luau`](examples/fusion-story.luau) — UI Labs `.story` module for a Fusion component; controls + `props.scope` cleanup.
 
