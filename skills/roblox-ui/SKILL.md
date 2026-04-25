@@ -628,6 +628,54 @@ local btn = scope:Button { Text = "OK", OnClick = save }
 
 `UsedAs<T>` is the right prop type for "constant or state object" — `peek()` and `use()` handle both transparently.
 
+### Optional vs nullable props
+
+`UsedAs<T>?` and `UsedAs<T?>` look similar but mean different things:
+
+```luau
+-- Optional with a sensible default — caller may omit; component substitutes a default.
+Position: UsedAs<UDim2>?
+
+-- Nullable — `nil` is itself a meaningful value the component reacts to
+-- (e.g. cleared input, no selection). Caller must pass it; the inner T is what's optional.
+Value: UsedAs<string?>
+```
+
+Rule: pick `UsedAs<T>?` when the prop has a default. Pick `UsedAs<T?>` when the absence of a value is part of the component's state model.
+
+### Typed scopes
+
+The `scope` parameter can carry the methods a component expects. Two patterns:
+
+```luau
+-- Public component: constrain the scope so callers see what's required.
+-- typeof(Fusion) covers all built-in constructors; narrow further if you want.
+local function Card(
+    scope: Fusion.Scope<typeof(Fusion)>,
+    props: { ... }
+): Frame
+    return scope:New "Frame" { ... }
+end
+
+-- Implementation-detail helpers: take a plain Fusion.Scope and derive an
+-- inner scope with the helpers attached. Callers don't need to know about them.
+local function Modal(scope: Fusion.Scope, props: { ... }): Frame
+    local inner = scope:innerScope { Backdrop = Backdrop, FocusTrap = FocusTrap }
+    return inner:New "Frame" { ... }
+end
+```
+
+Rule: prefer `innerScope` for niche helpers. Keeps the public signature clean and lets callers pass any compatible scope.
+
+### One component per file
+
+Each component (`Button`, `Card`, `Modal`) lives in its own ModuleScript. Improves discoverability, keeps files focused, encourages reuse. Compose by registering on a parent scope:
+
+```luau
+local scope = scoped(Fusion, { Button = Button, Card = Card })
+local ui = scope:Card { [Children] = scope:Button { Text = "OK" } }
+```
+
 ---
 
 ## Common Mistakes
