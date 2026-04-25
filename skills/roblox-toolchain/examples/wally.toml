@@ -1,0 +1,32 @@
+# Example Wally manifest. Drop in repo root; commit alongside wally.lock.
+
+[package]
+name = "yourname/mygame"
+description = "Source for MyGame"
+version = "0.1.0"
+license = "MIT"
+authors = ["Your Name <you@example.com>"]
+realm = "shared"
+registry = "https://github.com/UpliftGames/wally-index"
+
+# Excluded from the publish bundle (in addition to .gitignore'd files).
+exclude = ["build", "**/*.spec.luau"]
+
+# Set to true if this manifest belongs to a project, not a publishable package.
+private = true
+
+[dependencies]
+# Cargo-style versions. Default is `^` (compatible-update).
+React = "jsdotlua/react@^17.1.0"
+Promise = "evaera/roblox-lua-promise@^4.0.0"
+Signal = "sleitnick/signal@^2.0.0"
+
+[server-dependencies]
+# Server-only — these install into ServerPackages/, mounted under ServerScriptService/Storage.
+ProfileService = "loleris/profileservice@^1.4.0"
+DataStore2 = "kampfkarren/datastore2@^1.5.0"
+
+[dev-dependencies]
+# Excluded from production builds; install into DevPackages/.
+Jest = "jsdotlua/jest@^3.10.0"
+TestEZ = "roblox/testez@^0.4.1"

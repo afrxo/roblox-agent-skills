@@ -1,0 +1,13 @@
+*.rbxl
+*.rbxlx
+*.rbxl.lock
+*.rbxlx.lock
+Packages/
+ServerPackages/
+DevPackages/
+build/
+dist/
+node_modules/
+.vscode/
+.DS_Store
+*.log

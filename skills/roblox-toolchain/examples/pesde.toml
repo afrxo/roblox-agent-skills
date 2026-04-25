@@ -1,0 +1,41 @@
+# Example pesde manifest for a Roblox project pulling from both the pesde
+# index and the Wally registry via the bridge.
+
+name = "yourname/mygame"
+version = "0.1.0"
+description = "Source for MyGame"
+license = "MIT"
+authors = ["Your Name <you@example.com>"]
+private = true
+
+[target]
+environment = "roblox"
+lib = "src/init.luau"
+
+[indices]
+default = "https://github.com/pesde-pkg/index"
+
+[wally_indices]
+default = "https://github.com/UpliftGames/wally-index"
+
+[scripts]
+# Runnable via `pesde run <name>`. Executed under Lune.
+build = "scripts/build.luau"
+test = "scripts/test.luau"
+# Special: pesde calls this to produce sourcemaps for Wally bridge deps.
+sourcemap_generator = "scripts/sourcemap_generator.luau"
+
+[dependencies]
+# Native pesde deps
+hello = { name = "pesde/hello", version = "^1.0.0" }
+
+# Wally bridge — same registry semantics, different manifest field.
+React = { wally = "jsdotlua/react", version = "^17.1.0" }
+Promise = { wally = "evaera/roblox-lua-promise", version = "^4.0.0" }
+
+[dev_dependencies]
+Jest = { wally = "jsdotlua/jest", version = "^3.10.0" }
+
+# Pin the runtime + tooling versions this project requires.
+[engines]
+pesde = "^0.7.0"

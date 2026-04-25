@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Install Rokit (toolchain manager). Rokit reads rokit.toml and pulls
+      # exact pinned versions of rojo, wally, stylua, selene, luau-lsp.
+      - name: Install Rokit
+        run: |
+          curl -sSf https://raw.githubusercontent.com/rojo-rbx/rokit/main/scripts/install.sh | bash
+          echo "$HOME/.rokit/bin" >> $GITHUB_PATH
+
+      - name: Install pinned tools
+        run: rokit install --no-trust-check
+
+      # Wally: --locked fails CI if wally.lock is stale relative to wally.toml.
+      - name: Install Wally packages
+        run: wally install --locked
+        env:
+          WALLY_AUTH_TOKEN: ${{ secrets.WALLY_AUTH_TOKEN }}   # only if pulling private packages
+
+      # Formatting check — fail PR if `stylua` would change anything.
+      - name: stylua check
+        run: stylua --check src/
+
+      # Lint.
+      - name: selene
+        run: selene src/
+
+      # Generate sourcemap so luau-lsp resolves cross-file requires.
+      - name: Generate sourcemap
+        run: rojo sourcemap default.project.json --output sourcemap.json
+
+      # Type-check. Exact flags vary by luau-lsp version; verify against your pin.
+      - name: Type check
+        run: luau-lsp analyze --sourcemap=sourcemap.json --settings=.luaurc src/
+
+      # Build the place file. Artifact for downstream jobs (publish, release).
+      - name: Build place
+        run: |
+          mkdir -p build
+          rojo build default.project.json --output build/place.rbxl
+
+      - name: Upload place artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: place-${{ github.sha }}
+          path: build/place.rbxl
+          retention-days: 7

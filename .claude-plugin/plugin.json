@@ -1,0 +1,12 @@
+{
+  "name": "roblox-agent-skills",
+  "description": "Anthropic Agent Skills for Roblox development — Luau, engine, toolchain, UI.",
+  "version": "0.1.0",
+  "author": {
+    "name": "afrxo"
+  },
+  "homepage": "https://github.com/afrxo/roblox-agent-skills",
+  "repository": "https://github.com/afrxo/roblox-agent-skills",
+  "license": "MIT",
+  "keywords": ["roblox", "luau", "rojo", "fusion", "skills"]
+}

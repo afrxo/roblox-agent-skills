@@ -1,0 +1,23 @@
+{
+  "name": "roblox-agent-skills",
+  "owner": {
+    "name": "afrxo"
+  },
+  "metadata": {
+    "description": "Roblox-focused Agent Skills for Claude.",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "roblox-agent-skills",
+      "source": "./",
+      "description": "Four bundled Agent Skills for Roblox dev: luau-expert, roblox-dev, roblox-toolchain, roblox-ui.",
+      "version": "0.1.0",
+      "author": { "name": "afrxo" },
+      "homepage": "https://github.com/afrxo/roblox-agent-skills",
+      "repository": "https://github.com/afrxo/roblox-agent-skills",
+      "license": "MIT",
+      "tags": ["roblox", "luau", "rojo", "fusion"]
+    }
+  ]
+}
