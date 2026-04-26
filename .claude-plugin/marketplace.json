@@ -11,8 +11,8 @@
     {
       "name": "roblox-agent-skills",
       "source": {
-        "source": "github",
-        "repo": "afrxo/roblox-agent-skills"
+        "source": "url",
+        "url": "https://github.com/afrxo/roblox-agent-skills.git"
       },
       "description": "Four bundled Agent Skills for Roblox dev: luau-expert, roblox-dev, roblox-toolchain, roblox-ui.",
       "version": "0.1.0",
